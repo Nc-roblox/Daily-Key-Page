@@ -1,30 +1,42 @@
-name: Update Daily Key
+name: Update Key Every 5 Minutes
 
-# Run workflow every day at 00:00 UTC
 on:
   schedule:
-    - cron: "0 0 * * *"  # UTC midnight
-  workflow_dispatch: # allows manual trigger
+    - cron: '*/5 * * * *' # runs every 5 minutes
+  workflow_dispatch: # allows manual run too
 
 jobs:
   update-key:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
+      - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Generate today's key
-        run: |
-          #!/bin/bash
-          KEYS=("jtmI0tUHDMduYL7" "Mq0t78Fo1ykIlkY" "VmBYE02nRbcwUic" "mb8nQiGHykABvJL" "rkMkxGhPEpRxiKG" "cdO2IuLDSogAmQ5" "dvzqv76uF6DokOP" "wQJbZXB1EldYZan" "vrbh1jnNCXmkqEP" "pLoUlepYUUhrNHm")
-          INDEX=$(( $(date -u +%s) / 86400 % ${#KEYS[@]} ))
-          echo "${KEYS[$INDEX]}" > dailykey.txt
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20'
 
-      - name: Commit and push updated key
+      - name: Update dailykey.txt
+        run: |
+          # List of 10 secret keys
+          KEYS=("K1-a3B9xZ" "K2-zP0qLm" "K3-r8YtQw" "K4-p9HnVc" "K5-s5F4gT" "K6-u7JkL2" "K7-x1M0rN" "K8-b4V6dE" "K9-w2S8cY" "K10-q0Z7tU")
+          
+          # Calculate current interval number (5 minutes)
+          INTERVAL_NUMBER=$(( $(date +%s) / 300 )) # 300 seconds = 5 minutes
+          
+          # Pick key based on interval
+          INDEX=$(( INTERVAL_NUMBER % ${#KEYS[@]} ))
+          TODAY_KEY=${KEYS[$INDEX]}
+
+          # Write key to dailykey.txt
+          echo "$TODAY_KEY" > dailykey.txt
+
+      - name: Commit and push changes
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add dailykey.txt
-          git commit -m "Update daily key [skip ci]" || echo "No changes"
+          git commit -m "Update key automatically"
           git push
