@@ -1,44 +1,48 @@
-name: Update Daily Key
 
-on:
-  schedule:
-    - cron: '*/15 * * * *' # every 15 minutes
-  workflow_dispatch:
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Get Current Key</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>
+body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#0b1220;color:#e6eef8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
+.card{background:#0f1724;padding:28px;border-radius:10px;max-width:520px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center}
+h1{margin:0 0 12px 0;font-size:20px;color:#7bd3ff}
+p{margin:0 0 18px 0;color:#bcd9f0}
+pre{background:#061022;padding:14px;border-radius:8px;user-select:all;font-size:18px;letter-spacing:1px}
+button{margin-top:14px;padding:10px 16px;border-radius:8px;border:0;background:#0ea5a5;color:white;font-weight:700;cursor:pointer}
+small{display:block;margin-top:10px;color:#9fb7d2}
+</style>
+</head>
+<body>
+<div class="card">
+  <h1>Get Current Key</h1>
+  <p>The key changes every 15 minutes. Copy it below:</p>
+  <pre id="daily-key" aria-label="daily key">LOADING...</pre>
+  <button id="copyBtn">Copy key</button>
+  <small>Do not share publicly.</small>
+</div>
 
-jobs:
-  update-key:
-    runs-on: ubuntu-latest
+<script>
+const keys = [
+  "A1bX9kLq", "P3vN7zRt", "Q8mF2dWy", "L5sH4pVz", "G6rK1tBn",
+  "T9xJ3vQc", "Z2fL8wPm", "H4yR6qSd", "V7cN0bXk", "M1jT5zLv"
+];
 
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
+// index based on 15-minute interval
+const index = Math.floor(Date.now()/900000) % keys.length;
+const todaysKey = keys[index];
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
+document.getElementById("daily-key").textContent = todaysKey;
 
-      - name: Update dailykey.txt if changed
-        run: |
-          # Define your 10 keys in order
-          KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
-          
-          # Calculate index based on 15-min intervals (every 15 minutes)
-          INTERVAL=$(($(date +%s) / 900))  # 900 seconds = 15 minutes
-          INDEX=$(( INTERVAL % 10 ))
-
-          NEW_KEY="${KEYS[$INDEX]}"
-          
-          # Only update if different from current file
-          if [ ! -f dailykey.txt ] || [ "$(cat dailykey.txt)" != "$NEW_KEY" ]; then
-            echo "$NEW_KEY" > dailykey.txt
-            git config user.name "github-actions"
-            git config user.email "github-actions@github.com"
-            git add dailykey.txt
-            git commit -m "Update daily key"
-            git push
-          else
-            echo "Key unchanged, nothing to commit."
-          fi
-        env:
-          GITHUB_TOKEN: ${{ secrets.PAT }}
+document.getElementById("copyBtn").addEventListener("click", function() {
+  navigator.clipboard.writeText(todaysKey).then(() => {
+    alert("Key copied!");
+  }, () => {
+    alert("Copy failed. Do it manually.");
+  });
+});
+</script>
+</body>
+</html>
