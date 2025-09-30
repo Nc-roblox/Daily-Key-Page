@@ -1,1 +1,30 @@
+name: Update Daily Key
 
+# Run workflow every day at 00:00 UTC
+on:
+  schedule:
+    - cron: "0 0 * * *"  # UTC midnight
+  workflow_dispatch: # allows manual trigger
+
+jobs:
+  update-key:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Generate today's key
+        run: |
+          #!/bin/bash
+          KEYS=("jtmI0tUHDMduYL7" "Mq0t78Fo1ykIlkY" "VmBYE02nRbcwUic" "mb8nQiGHykABvJL" "rkMkxGhPEpRxiKG" "cdO2IuLDSogAmQ5" "dvzqv76uF6DokOP" "wQJbZXB1EldYZan" "vrbh1jnNCXmkqEP" "pLoUlepYUUhrNHm")
+          INDEX=$(( $(date -u +%s) / 86400 % ${#KEYS[@]} ))
+          echo "${KEYS[$INDEX]}" > dailykey.txt
+
+      - name: Commit and push updated key
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add dailykey.txt
+          git commit -m "Update daily key [skip ci]" || echo "No changes"
+          git push
