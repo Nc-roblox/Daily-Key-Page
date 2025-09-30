@@ -2,8 +2,11 @@ name: Update Daily Key
 
 on:
   schedule:
-    - cron: "*/1 * * * *"  # runs every 1 minute (UTC)
-  workflow_dispatch:  # allows manual trigger
+    - cron: "*/1 * * * *"  # every 1 minute UTC
+  workflow_dispatch:
+
+permissions:
+  contents: write  # needed to push back changes
 
 jobs:
   update-key:
@@ -17,13 +20,12 @@ jobs:
           KEYS=("A1b2C3d4" "E5f6G7h8" "I9j0K1l2" "M3n4O5p6" "Q7r8S9t0" "U1v2W3x4" "Y5z6A7b8" "C9d0E1f2" "G3h4I5j6" "K7l8M9n0")
           LENGTH=${#KEYS[@]}
           SECONDS_SINCE_EPOCH=$(date +%s)
-          INDEX=$(( SECONDS_SINCE_EPOCH / 60 % LENGTH ))  # 1-minute interval
+          INDEX=$(( SECONDS_SINCE_EPOCH / 60 % LENGTH ))  # every 1 minute
           echo "${KEYS[$INDEX]}" > dailykey.txt
+          cat dailykey.txt  # just to verify in logs
 
       - name: Commit and push
-        run: |
-          git config --local user.email "actions@github.com"
-          git config --local user.name "GitHub Actions"
-          git add dailykey.txt
-          git commit -m "Update dailykey.txt automatically"
-          git push
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Update dailykey.txt automatically"
+          branch: main
