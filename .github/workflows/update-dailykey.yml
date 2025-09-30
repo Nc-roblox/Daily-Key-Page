@@ -8,21 +8,37 @@ on:
 jobs:
   update-key:
     runs-on: ubuntu-latest
+
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Update dailykey.txt
-        run: |
-          KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
-          # Every 15 minutes index
-          INDEX=$(( ($(date +%s) / 900) % 10 ))
-          echo "${KEYS[$INDEX]}" > dailykey.txt
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
 
-      - name: Commit and push changes
+      - name: Update dailykey.txt if changed
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git add dailykey.txt
-          git commit -m "Update daily key" || echo "No changes to commit"
-          git push https://x-access-token:${{ secrets.PAT }}@github.com/<USERNAME>/<REPO>.git HEAD:main
+          # Define your 10 keys in order
+          KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
+          
+          # Calculate index based on 15-min intervals (every 15 minutes)
+          INTERVAL=$(($(date +%s) / 900))  # 900 seconds = 15 minutes
+          INDEX=$(( INTERVAL % 10 ))
+
+          NEW_KEY="${KEYS[$INDEX]}"
+          
+          # Only update if different from current file
+          if [ ! -f dailykey.txt ] || [ "$(cat dailykey.txt)" != "$NEW_KEY" ]; then
+            echo "$NEW_KEY" > dailykey.txt
+            git config user.name "github-actions"
+            git config user.email "github-actions@github.com"
+            git add dailykey.txt
+            git commit -m "Update daily key"
+            git push
+          else
+            echo "Key unchanged, nothing to commit."
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.PAT }}
