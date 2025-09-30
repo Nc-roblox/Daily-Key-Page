@@ -1,8 +1,8 @@
-name: Update Key Every Minute
+name: Update Daily Key
 
 on:
   schedule:
-    - cron: '*/1 * * * *'  # every 1 minute UTC
+    - cron: '*/1 * * * *' # every minute
   workflow_dispatch:
 
 jobs:
@@ -12,17 +12,23 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set current key
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Update dailykey.txt
         run: |
-          KEYS=("K1aB9xZ1" "K2zP0qLm" "K3r8YtQw" "K4p9HnVc" "K5s5F4gT" "K6u7JkL2" "K7x1M0rN" "K8b4V6dE" "K9w2S8cY" "K10q0Z7t")
-          MINUTE_NUMBER=$(( $(date -u +%s) / 60 ))
-          INDEX=$(( MINUTE_NUMBER % ${#KEYS[@]} ))
+          KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
+          INDEX=$(( ($(date +%s) / 60) % 10 ))
           echo "${KEYS[$INDEX]}" > dailykey.txt
 
-      - name: Commit updated key
+      - name: Commit changes
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add dailykey.txt
           git commit -m "Update daily key"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
