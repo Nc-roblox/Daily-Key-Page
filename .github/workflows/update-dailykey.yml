@@ -1,12 +1,9 @@
-name: Update Daily Key
+name: Update Key Every Minute
 
 on:
   schedule:
-    - cron: "*/1 * * * *"  # every 1 minute UTC
+    - cron: '*/1 * * * *'  # every 1 minute UTC
   workflow_dispatch:
-
-permissions:
-  contents: write  # needed to push back changes
 
 jobs:
   update-key:
@@ -15,17 +12,17 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set keys and pick current one
+      - name: Set current key
         run: |
-          KEYS=("A1b2C3d4" "E5f6G7h8" "I9j0K1l2" "M3n4O5p6" "Q7r8S9t0" "U1v2W3x4" "Y5z6A7b8" "C9d0E1f2" "G3h4I5j6" "K7l8M9n0")
-          LENGTH=${#KEYS[@]}
-          SECONDS_SINCE_EPOCH=$(date +%s)
-          INDEX=$(( SECONDS_SINCE_EPOCH / 60 % LENGTH ))  # every 1 minute
+          KEYS=("K1aB9xZ1" "K2zP0qLm" "K3r8YtQw" "K4p9HnVc" "K5s5F4gT" "K6u7JkL2" "K7x1M0rN" "K8b4V6dE" "K9w2S8cY" "K10q0Z7t")
+          MINUTE_NUMBER=$(( $(date -u +%s) / 60 ))
+          INDEX=$(( MINUTE_NUMBER % ${#KEYS[@]} ))
           echo "${KEYS[$INDEX]}" > dailykey.txt
-          cat dailykey.txt  # just to verify in logs
 
-      - name: Commit and push
-        uses: stefanzweifel/git-auto-commit-action@v5
-        with:
-          commit_message: "Update dailykey.txt automatically"
-          branch: main
+      - name: Commit updated key
+        run: |
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add dailykey.txt
+          git commit -m "Update daily key"
+          git push
