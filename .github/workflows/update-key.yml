@@ -9,26 +9,17 @@ jobs:
   update-key:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v3
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 18
-
-      - name: Generate daily key
+      - uses: actions/checkout@v3
+      - name: Generate today's key
         run: |
-          keys=("K1-a3B9xZ" "K2-zP0qLm" "K3-r8YtQw" "K4-p9HnVc" "K5-s5F4gT" "K6-u7JkL2" "K7-x1M0rN" "K8-b4V6dE" "K9-w2S8cY" "K10-q0Z7tU")
-          interval_seconds=30
-          now=$(date +%s)
-          idx=$(( (now / interval_seconds) % ${#keys[@]} ))
+          keys=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
+          minute=$(( $(date +%s) / 60 ))
+          idx=$(( minute % ${#keys[@]} ))
           echo "${keys[$idx]}" > dailykey.txt
-
-      - name: Commit updated key
+      - name: Commit & push
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config user.name "github-actions"
+          git config user.email "actions@github.com"
           git add dailykey.txt
-          git commit -m "Update daily key automatically"
+          git commit -m "Update key"
           git push
