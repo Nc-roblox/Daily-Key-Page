@@ -2,7 +2,7 @@ name: Update Daily Key
 
 on:
   schedule:
-    - cron: '*/1 * * * *' # every minute
+    - cron: '*/1 * * * *'  # runs every minute
   workflow_dispatch:
 
 jobs:
@@ -11,22 +11,19 @@ jobs:
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
-        with:
-          persist-credentials: true
 
       - name: Update dailykey.txt
         run: |
           KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
           INDEX=$(( ($(date +%s) / 60) % 10 ))
           echo "${KEYS[$INDEX]}" > dailykey.txt
-          echo "Today's key: ${KEYS[$INDEX]}"
 
-      - name: Commit changes
+      - name: Commit and push changes
+        env:
+          PAT: ${{ secrets.PAT }}
         run: |
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add dailykey.txt
           git commit -m "Update daily key" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          git push https://$PAT@github.com/${GITHUB_REPOSITORY}.git HEAD:main
