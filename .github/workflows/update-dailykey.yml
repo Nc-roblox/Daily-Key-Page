@@ -1,0 +1,29 @@
+name: Update Daily Key
+
+on:
+  schedule:
+    - cron: "*/1 * * * *"  # runs every 1 minute (UTC)
+  workflow_dispatch:  # allows manual trigger
+
+jobs:
+  update-key:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v3
+
+      - name: Set keys and pick current one
+        run: |
+          KEYS=("A1b2C3d4" "E5f6G7h8" "I9j0K1l2" "M3n4O5p6" "Q7r8S9t0" "U1v2W3x4" "Y5z6A7b8" "C9d0E1f2" "G3h4I5j6" "K7l8M9n0")
+          LENGTH=${#KEYS[@]}
+          SECONDS_SINCE_EPOCH=$(date +%s)
+          INDEX=$(( SECONDS_SINCE_EPOCH / 60 % LENGTH ))  # 1-minute interval
+          echo "${KEYS[$INDEX]}" > dailykey.txt
+
+      - name: Commit and push
+        run: |
+          git config --local user.email "actions@github.com"
+          git config --local user.name "GitHub Actions"
+          git add dailykey.txt
+          git commit -m "Update dailykey.txt automatically"
+          git push
