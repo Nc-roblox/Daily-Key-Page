@@ -5,49 +5,49 @@
   <title>Get Today's Key</title>
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <style>
-    body { font-family: system-ui,Segoe UI,Roboto,Arial; background:#0b1220; color:#e6eef8; display:flex; align-items:center; justify-content:center; height:100vh; margin:0 }
-    .card { background:#0f1724; padding:28px; border-radius:10px; max-width:520px; width:100%; box-shadow:0 8px 30px rgba(0,0,0,.6); text-align:center }
-    h1 { margin:0 0 12px 0; font-size:20px; color:#7bd3ff }
-    p { margin:0 0 18px 0; color:#bcd9f0 }
-    pre { background:#061022; padding:14px; border-radius:8px; user-select:all; font-size:18px; letter-spacing:1px }
-    button { margin-top:14px; padding:10px 16px; border-radius:8px; border:0; background:#0ea5a5; color:white; font-weight:700; cursor:pointer }
-    small { display:block; margin-top:10px; color:#9fb7d2 }
+    body { font-family: system-ui, Segoe UI, Roboto, Arial; background: #0b1220; color: #e6eef8; display: flex; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+    .card { background: #0f1724; padding: 28px; border-radius: 10px; max-width: 520px; width: 100%; box-shadow: 0 8px 30px rgba(0,0,0,.6); text-align: center; }
+    h1 { margin: 0 0 12px 0; font-size: 20px; color: #7bd3ff; }
+    p { margin: 0 0 18px 0; color: #bcd9f0; }
+    pre { background: #061022; padding: 14px; border-radius: 8px; user-select: all; font-size: 18px; letter-spacing: 1px; }
+    button { margin-top: 14px; padding: 10px 16px; border-radius: 8px; border: 0; background: #0ea5a5; color: white; font-weight: 700; cursor: pointer; }
+    small { display: block; margin-top: 10px; color: #9fb7d2; }
   </style>
 </head>
 <body>
   <div class="card">
-    <h1>Complete the Linkvertise step to get the key</h1>
-    <p>After completing Linkvertise, copy the key below — paste it into the script.</p>
+    <h1>Complete the Linkvertise step to get today's key</h1>
+    <p>After Linkvertise, come back here and copy the key below — paste it into the script.</p>
     <pre id="daily-key" aria-label="daily key">LOADING...</pre>
     <button id="copyBtn">Copy key</button>
-    <small>Key changes every 30 seconds. Do not share publicly.</small>
+    <small>Key changes every minute. Do not share publicly.</small>
   </div>
 
   <script>
     const keys = [
-      "K1-a3B9xZ","K2-zP0qLm","K3-r8YtQw","K4-p9HnVc","K5-s5F4gT",
-      "K6-u7JkL2","K7-x1M0rN","K8-b4V6dE","K9-w2S8cY","K10-q0Z7tU"
+      "A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn",
+      "T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"
     ];
 
-    function pickIndexForInterval(length) {
-      const msPerCycle = 30 * 1000; // 30 seconds
-      const intervalNumber = Math.floor(Date.now() / msPerCycle);
-      return intervalNumber % length;
+    function pickIndexForMinute(length) {
+      const msPerMinute = 60 * 1000;
+      const minuteNumber = Math.floor(Date.now() / msPerMinute);
+      return minuteNumber % length;
     }
 
     function updateKey() {
-      const idx = pickIndexForInterval(keys.length);
+      const idx = pickIndexForMinute(keys.length);
       const todaysKey = keys[idx];
       document.getElementById("daily-key").textContent = todaysKey;
     }
 
-    updateKey(); // initial
-    setInterval(updateKey, 1000); // update visually every second
+    updateKey();
+    setInterval(updateKey, 60 * 1000);
 
     document.getElementById("copyBtn").addEventListener("click", function() {
       navigator.clipboard.writeText(document.getElementById("daily-key").textContent)
         .then(() => alert("Key copied to clipboard"))
-        .catch(() => alert("Could not copy automatically. Copy manually."));
+        .catch(() => alert("Could not copy automatically. Select and copy manually."));
     });
   </script>
 </body>
