@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Key</title>
+  <title>Daily Key (3-Min Test)</title>
   <style>
     body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
     #daily-key { font-size: 2em; font-weight: bold; color: #0077cc; margin: 20px 0; }
@@ -11,16 +11,15 @@
   </style>
 </head>
 <body>
-  <h1>Current Daily Key</h1>
+  <h1>Current Daily Key (3-Min Test)</h1>
   <div id="daily-key">Loading...</div>
   <div id="last-updated"></div>
 
   <script>
     const keys = ["A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn","T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"];
-    const intervalSeconds = 21600; // 6 hours
+    const intervalSeconds = 180; // 3 minutes
 
     function getRandomIndex(interval) {
-      // Same formula as workflow
       return (interval * 9301 + 49297) % keys.length;
     }
 
