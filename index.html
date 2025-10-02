@@ -3,24 +3,81 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Daily Key (3-Min Test)</title>
+  <title>Daily Key</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
-    #daily-key { font-size: 2em; font-weight: bold; color: #0077cc; margin: 20px 0; }
-    #last-updated { color: #555; margin-top: 10px; }
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #0d1b2a; /* dark blue */
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 2em;
+      margin-bottom: 1rem;
+      color: #00bcd4;
+    }
+
+    #daily-key-container {
+      background: #1b263b;
+      padding: 30px 50px;
+      border-radius: 15px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    #daily-key {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #00e5ff;
+      user-select: all;
+    }
+
+    #copy-btn {
+      padding: 10px 25px;
+      font-size: 1em;
+      background: #00bcd4;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+      color: #0d1b2a;
+      font-weight: bold;
+    }
+
+    #copy-btn:hover {
+      background: #00e5ff;
+    }
+
+    #last-updated {
+      color: #9db2c9;
+      font-size: 0.9em;
+    }
   </style>
 </head>
 <body>
-  <h1>Current Daily Key (3-Min Test)</h1>
-  <div id="daily-key">Loading...</div>
-  <div id="last-updated"></div>
+  <h1>Current Daily Key</h1>
+  <div id="daily-key-container">
+    <div id="daily-key">Loading...</div>
+    <button id="copy-btn">Copy Key</button>
+    <div id="last-updated"></div>
+  </div>
 
   <script>
     const keys = ["A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn","T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"];
     const intervalSeconds = 180; // 3 minutes
 
     function getRandomIndex(interval) {
-      return (interval * 9301 + 49297) % keys.length;
+      return (interval * 9301 + 49297) % keys.length; // same as workflow
     }
 
     function updateKey() {
@@ -36,10 +93,18 @@
       document.getElementById("last-updated").textContent = "Next key update: " + new Date(nextUpdateUTC).toUTCString();
     }
 
+    // Copy button functionality
+    document.getElementById("copy-btn").addEventListener("click", () => {
+      const key = document.getElementById("daily-key").textContent;
+      navigator.clipboard.writeText(key).then(() => {
+        document.getElementById("copy-btn").textContent = "Copied!";
+        setTimeout(() => { document.getElementById("copy-btn").textContent = "Copy Key"; }, 1500);
+      });
+    });
+
     // Initial load
     updateKey();
-
-    // Auto-refresh every second
+    // Auto-refresh every second so it stays in sync
     setInterval(updateKey, 1000);
   </script>
 </body>
