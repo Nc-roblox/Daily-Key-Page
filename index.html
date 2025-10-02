@@ -1,47 +1,47 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-<meta charset="utf-8">
-<title>Get Current Key</title>
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<style>
-body{font-family:system-ui,Segoe UI,Roboto,Arial;background:#0b1220;color:#e6eef8;display:flex;align-items:center;justify-content:center;height:100vh;margin:0}
-.card{background:#0f1724;padding:28px;border-radius:10px;max-width:520px;width:100%;box-shadow:0 8px 30px rgba(0,0,0,.6);text-align:center}
-h1{margin:0 0 12px 0;font-size:20px;color:#7bd3ff}
-p{margin:0 0 18px 0;color:#bcd9f0}
-pre{background:#061022;padding:14px;border-radius:8px;user-select:all;font-size:18px;letter-spacing:1px}
-button{margin-top:14px;padding:10px 16px;border-radius:8px;border:0;background:#0ea5a5;color:white;font-weight:700;cursor:pointer}
-small{display:block;margin-top:10px;color:#9fb7d2}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily Key</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; padding: 50px; background: #f0f0f0; }
+    #daily-key { font-size: 2em; font-weight: bold; color: #0077cc; margin: 20px 0; }
+    #last-updated { color: #555; margin-top: 10px; }
+  </style>
 </head>
 <body>
-<div class="card">
-  <h1>Get Current Key</h1>
-  <p>The key changes every 6 hours. Copy it below:</p>
-  <pre id="daily-key" aria-label="daily key">LOADING...</pre>
-  <button id="copyBtn">Copy key</button>
-  <small>Do not share publicly.</small>
-</div>
+  <h1>Current Daily Key</h1>
+  <div id="daily-key">Loading...</div>
+  <div id="last-updated"></div>
 
-<script>
-const keys = [
-  "A1bX9kLq", "P3vN7zRt", "Q8mF2dWy", "L5sH4pVz", "G6rK1tBn",
-  "T9xJ3vQc", "Z2fL8wPm", "H4yR6qSd", "V7cN0bXk", "M1jT5zLv"
-];
+  <script>
+    const keys = ["A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn","T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"];
+    const intervalSeconds = 21600; // 6 hours
 
-// index based on 6-hour interval
-const index = Math.floor(Date.now()/21600000) % keys.length; // 21600000 ms = 6 hours
-const todaysKey = keys[index];
+    function getRandomIndex(interval) {
+      // Same formula as workflow
+      return (interval * 9301 + 49297) % keys.length;
+    }
 
-document.getElementById("daily-key").textContent = todaysKey;
+    function updateKey() {
+      const nowUTC = Math.floor(Date.now() / 1000);
+      const interval = Math.floor(nowUTC / intervalSeconds);
 
-document.getElementById("copyBtn").addEventListener("click", function() {
-  navigator.clipboard.writeText(todaysKey).then(() => {
-    alert("Key copied!");
-  }, () => {
-    alert("Copy failed. Do it manually.");
-  });
-});
-</script>
+      const index = getRandomIndex(interval);
+      const currentKey = keys[index];
+
+      document.getElementById("daily-key").textContent = currentKey;
+
+      const nextUpdateUTC = ((interval + 1) * intervalSeconds) * 1000;
+      document.getElementById("last-updated").textContent = "Next key update: " + new Date(nextUpdateUTC).toUTCString();
+    }
+
+    // Initial load
+    updateKey();
+
+    // Auto-refresh every second
+    setInterval(updateKey, 1000);
+  </script>
 </body>
 </html>
