@@ -7,105 +7,81 @@
   <style>
     body {
       margin: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #0d1b2a; /* dark blue */
-      color: #fff;
+      padding: 0;
+      font-family: Arial, sans-serif;
+      background: #0d1b2a;
+      color: #e0e1dd;
       display: flex;
       flex-direction: column;
       justify-content: center;
       align-items: center;
       height: 100vh;
-      text-align: center;
     }
-
-    h1 {
-      font-size: 2em;
-      margin-bottom: 1rem;
-      color: #00bcd4;
-    }
-
-    #daily-key-container {
+    .container {
       background: #1b263b;
-      padding: 30px 50px;
-      border-radius: 15px;
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 20px;
+      padding: 2rem;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.5);
     }
-
-    #daily-key {
-      font-size: 2.5em;
+    h1 {
+      margin-bottom: 1rem;
+      font-size: 2rem;
+      color: #f5f7fa;
+    }
+    #key {
+      font-size: 1.5rem;
       font-weight: bold;
-      color: #00e5ff;
-      user-select: all;
-    }
-
-    #copy-btn {
-      padding: 10px 25px;
-      font-size: 1em;
-      background: #00bcd4;
-      border: none;
+      background: #415a77;
+      padding: 0.5rem 1rem;
       border-radius: 8px;
+      margin-bottom: 1rem;
+      display: inline-block;
+    }
+    button {
+      background: #778da9;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 1rem;
       cursor: pointer;
-      transition: background 0.2s ease;
-      color: #0d1b2a;
-      font-weight: bold;
+      transition: background 0.3s ease;
     }
-
-    #copy-btn:hover {
-      background: #00e5ff;
-    }
-
-    #last-updated {
-      color: #9db2c9;
-      font-size: 0.9em;
+    button:hover {
+      background: #a9bcd0;
     }
   </style>
 </head>
 <body>
-  <h1>Current Daily Key</h1>
-  <div id="daily-key-container">
-    <div id="daily-key">Loading...</div>
-    <button id="copy-btn">Copy Key</button>
-    <div id="last-updated"></div>
+  <div class="container">
+    <h1>Today's Key</h1>
+    <div id="key">Loading...</div>
+    <button onclick="copyKey()">Copy Key</button>
   </div>
 
   <script>
-    const keys = ["A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn","T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"];
-    const intervalSeconds = 180; // 3 minutes
+    const KEYS = [
+      "A1bX9kLq","P3vN7zRt","Q8mF2dWy","L5sH4pVz","G6rK1tBn",
+      "T9xJ3vQc","Z2fL8wPm","H4yR6qSd","V7cN0bXk","M1jT5zLv"
+    ];
 
-    function getRandomIndex(interval) {
-      return (interval * 9301 + 49297) % keys.length; // same as workflow
+    function getKey() {
+      const interval = Math.floor(Date.now() / 1000 / 900); // 900s = 15 min
+      const index = (interval * 9301 + 49297) % KEYS.length;
+      return KEYS[index];
     }
 
-    function updateKey() {
-      const nowUTC = Math.floor(Date.now() / 1000);
-      const interval = Math.floor(nowUTC / intervalSeconds);
-
-      const index = getRandomIndex(interval);
-      const currentKey = keys[index];
-
-      document.getElementById("daily-key").textContent = currentKey;
-
-      const nextUpdateUTC = ((interval + 1) * intervalSeconds) * 1000;
-      document.getElementById("last-updated").textContent = "Next key update: " + new Date(nextUpdateUTC).toUTCString();
+    function showKey() {
+      document.getElementById("key").textContent = getKey();
     }
 
-    // Copy button functionality
-    document.getElementById("copy-btn").addEventListener("click", () => {
-      const key = document.getElementById("daily-key").textContent;
-      navigator.clipboard.writeText(key).then(() => {
-        document.getElementById("copy-btn").textContent = "Copied!";
-        setTimeout(() => { document.getElementById("copy-btn").textContent = "Copy Key"; }, 1500);
-      });
-    });
+    function copyKey() {
+      navigator.clipboard.writeText(document.getElementById("key").textContent);
+      alert("Key copied!");
+    }
 
-    // Initial load
-    updateKey();
-    // Auto-refresh every second so it stays in sync
-    setInterval(updateKey, 1000);
+    showKey();
   </script>
 </body>
 </html>
