@@ -2,29 +2,27 @@ name: Update Daily Key (15-Min Auto)
 
 on:
   schedule:
-    - cron: '*/15 * * * *' # every 15 minutes UTC
+    - cron: '*/15 * * * *'  # every 15 minutes UTC
   workflow_dispatch:
 
 jobs:
   update-key:
     runs-on: ubuntu-latest
-
     steps:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Update dailykey.txt (forced commit)
+      - name: Generate current key
         run: |
           KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
-          INTERVAL=$(($(date +%s) / 900))
+          INTERVAL=$(($(date +%s) / 900))  # 15-min interval
           INDEX=$(( (INTERVAL * 9301 + 49297) % ${#KEYS[@]} ))
           NEW_KEY="${KEYS[$INDEX]}"
+          echo "Current key: $NEW_KEY"
           echo "$NEW_KEY" > dailykey.txt
 
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git add dailykey.txt
-          git commit -m "Auto-update daily key at interval $INTERVAL" --allow-empty
+          git commit -m "Update daily key" --allow-empty
           git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
