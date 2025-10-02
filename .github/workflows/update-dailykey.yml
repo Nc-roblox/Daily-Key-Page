@@ -13,23 +13,20 @@ jobs:
       - name: Checkout repo
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '18'
-
       - name: Update dailykey.txt if changed
         run: |
-          # Define your 10 keys in order
+          # Define your 10 keys
           KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
           
-          # Calculate index based on 6-hour intervals
-          INTERVAL=$(($(date +%s) / 21600))  # 21600 seconds = 6 hours
-          INDEX=$(( INTERVAL % 10 ))
+          # 6-hour interval (UTC)
+          INTERVAL=$(($(date +%s) / 21600))
+
+          # Pseudo-random index based on interval (linear congruential)
+          INDEX=$(( (INTERVAL * 9301 + 49297) % ${#KEYS[@]} ))
 
           NEW_KEY="${KEYS[$INDEX]}"
-          
-          # Only update if different from current file
+
+          # Update file if changed
           if [ ! -f dailykey.txt ] || [ "$(cat dailykey.txt)" != "$NEW_KEY" ]; then
             echo "$NEW_KEY" > dailykey.txt
             git config user.name "github-actions"
