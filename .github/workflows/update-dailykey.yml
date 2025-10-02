@@ -2,7 +2,7 @@ name: Update Daily Key
 
 on:
   schedule:
-    - cron: '0 */6 * * *' # every 6 hours
+    - cron: '*/3 * * * *' # every 3 minutes
   workflow_dispatch:
 
 jobs:
@@ -18,10 +18,10 @@ jobs:
           # Define your 10 keys
           KEYS=("A1bX9kLq" "P3vN7zRt" "Q8mF2dWy" "L5sH4pVz" "G6rK1tBn" "T9xJ3vQc" "Z2fL8wPm" "H4yR6qSd" "V7cN0bXk" "M1jT5zLv")
           
-          # 6-hour interval (UTC)
-          INTERVAL=$(($(date +%s) / 21600))
+          # 3-minute interval (UTC)
+          INTERVAL=$(($(date +%s) / 180))  # 180 seconds = 3 minutes
 
-          # Pseudo-random index based on interval (linear congruential)
+          # Pseudo-random index based on interval
           INDEX=$(( (INTERVAL * 9301 + 49297) % ${#KEYS[@]} ))
 
           NEW_KEY="${KEYS[$INDEX]}"
